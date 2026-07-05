@@ -20,6 +20,20 @@
     --radius: 10px;
     --radius-sm: 6px;
   }
+  
+  .brand-container{
+  display:flex;
+  flex-direction:column;
+  line-height:1.1;
+}
+
+.slogan{
+  font-size:11.5px;
+  font-weight:500;
+  color: var(--muted);
+  margin-top:2px;
+  letter-spacing:0.02em;
+}
 
   *{ box-sizing: border-box; }
   html{ scroll-behavior: smooth; }
@@ -52,13 +66,22 @@
     position: sticky; top:0; height:100vh;
   }
   .sidebar-logo{
-    width:36px; height:36px; border-radius:9px;
-    background: var(--accent);
-    display:flex; align-items:center; justify-content:center;
-    margin-bottom: 34px;
-    font-family:'Manrope', sans-serif; font-weight:800; font-size:16px;
-    color:#fff;
-  }
+  width:100px;
+  height:70px;
+  margin-bottom:50px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  background: transparent; /* removes SN-style box */
+  padding: 0;
+}
+
+.sidebar-logo img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
   .side-nav{ display:flex; flex-direction:column; gap:6px; width:100%; }
   .side-link{
     display:flex; flex-direction:column; align-items:center; gap:6px;
@@ -272,6 +295,22 @@
     font-size:11px; font-weight:700;
   }
   .imdb-pill b{ color:#f5c518; }
+  .watchlist-toggle{
+    position:absolute; top:8px; right:8px; z-index:2;
+    width:28px; height:28px; border-radius:50%;
+    background: rgba(11,13,18,0.75); backdrop-filter: blur(2px);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--text); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition: background .15s ease, border-color .15s ease, color .15s ease, transform .1s ease;
+  }
+  .watchlist-toggle:hover{ background: rgba(11,13,18,0.9); border-color: rgba(255,255,255,0.3); }
+  .watchlist-toggle:active{ transform: scale(0.9); }
+  .watchlist-toggle svg{ pointer-events:none; }
+  .watchlist-toggle.active{
+    background: var(--accent); border-color: var(--accent); color:#fff;
+  }
+  .watchlist-toggle.active svg{ fill: currentColor; }
   .card-title{ font-size:13.5px; font-weight:600; margin-top:10px; line-height:1.3; }
   .card-sub{ font-size:12px; color: var(--muted); margin-top:2px; }
 
@@ -316,6 +355,35 @@
 
   footer{ padding: 30px 36px 46px; color: var(--muted); font-size:12.5px; border-top:1px solid var(--hairline); }
 
+  /* ---------- Flat catalog grids (Movies / Series) ---------- */
+  .grid-wall{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 22px 18px;
+  }
+  .grid-wall .card{ flex:none; width:100%; }
+  .catalog-empty{ color: var(--muted); font-size:14px; }
+
+  /* ---------- Genre picker ---------- */
+  .genre-grid{ display:flex; flex-wrap:wrap; gap:12px; }
+  .genre-pill{
+    display:inline-flex; align-items:center; gap:8px;
+    background: var(--panel); border:1px solid var(--hairline);
+    padding: 11px 20px; border-radius: 999px;
+    font-size:13.5px; font-weight:700; color:var(--text); cursor:pointer;
+    transition: background .15s ease, border-color .15s ease, transform .1s ease;
+  }
+  .genre-pill:hover{ background: var(--panel-2); border-color: rgba(255,255,255,0.18); transform: translateY(-2px); }
+  .genre-pill:active{ transform: translateY(0) scale(0.98); }
+  .genre-pill.active{ background: var(--accent); border-color: var(--accent); color:#fff; }
+
+  .row-highlight{ animation: rowPulse 1.2s ease; border-radius: 14px; }
+  @keyframes rowPulse{
+    0%{ box-shadow: 0 0 0 0 rgba(229,72,77,0.45); }
+    70%{ box-shadow: 0 0 0 16px rgba(229,72,77,0); }
+    100%{ box-shadow: 0 0 0 0 rgba(229,72,77,0); }
+  }
+
   @media (max-width: 900px){
     .hero-grid{ grid-template-columns: 1fr; }
     .hero-thumbs{ display:none; }
@@ -332,34 +400,39 @@
 
 <div class="app">
   <aside class="sidebar">
-    <div class="sidebar-logo">SN</div>
+    <div class="sidebar-logo">
+  <img src="https://i.imgur.com/OMPKRtT.png" alt="Logo">
+</div>
     <nav class="side-nav">
-      <a class="side-link active" href="#">
+      <a class="side-link active" href="#" id="homeNavLink" data-view="browse">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
         Home
       </a>
-      <a class="side-link" href="#">
+      <a class="side-link" href="#" id="moviesNavLink" data-view="movies">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 8h18M3 16h18M8 3v18M16 3v18"/></svg>
         Movies
       </a>
-      <a class="side-link" href="#">
+      <a class="side-link" href="#" id="seriesNavLink" data-view="series">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 8L4 4v16l16-4"/><rect x="2" y="2" width="20" height="20" rx="2" opacity="0"/></svg>
         Series
       </a>
-      <a class="side-link" href="#">
+      <a class="side-link" href="#" id="genresNavLink" data-view="genres">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 12.3 12 21l-8.6-8.7a4.5 4.5 0 0 1 0-6.4 4.5 4.5 0 0 1 6.4 0L12 8l2.2-2.1a4.5 4.5 0 1 1 6.4 6.4z" opacity="0"/><path d="M7 7h.01"/><path d="M2 12l9 9 11-11-4-4L7 17z"/></svg>
         Genres
       </a>
-      <a class="side-link" href="#">
+      <a class="side-link" href="#" id="watchlistNavLink" data-view="watchlist">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-        Saved
+        Watchlist
       </a>
     </nav>
   </aside>
 
   <div class="main">
     <header class="topbar">
-      <div class="brand">Sleepless<span>Nights</span></div>
+      <div class="brand-container">
+  <div class="brand">Sleepless<span>Nights</span></div>
+  <div class="slogan">Too good to sleep on</div>
+</div>
       <div class="search-bar">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         <input id="searchInput" type="text" placeholder="Search titles…">
@@ -373,6 +446,7 @@
       </div>
     </header>
 
+    <div id="browseView">
     <section class="hero">
       <div class="hero-grid">
         <div class="hero-info" id="heroInfo">
@@ -468,6 +542,21 @@
       </div>
       <div class="reel" id="horrorReel"></div>
     </section>
+
+    <section class="row">
+      <div class="row-head">
+        <div class="row-icon">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 8h18M3 16h18M8 3v18M16 3v18"/></svg>
+        </div>
+        <h2 class="display">Korean</h2>
+        <div class="row-nav">
+          <button aria-label="Scroll left" data-target="koreanReel" data-dir="-1">‹</button>
+          <button aria-label="Scroll right" data-target="koreanReel" data-dir="1">›</button>
+        </div>
+      </div>
+      <div class="reel" id="koreanReel"></div>
+    </section>
+
     <section class="row">
       <div class="row-head">
         <div class="row-icon">
@@ -663,9 +752,68 @@
       </div>
       <div class="reel" id="sportsReel"></div>
     </section>
+    </div>
+
+    <div id="watchlistView" style="display:none;">
+      <section class="row">
+        <div class="row-head">
+          <div class="row-icon">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <h2 class="display">My Watchlist</h2>
+        </div>
+        <div class="reel" id="watchlistReel"></div>
+        <p id="watchlistEmpty" style="color:var(--muted); font-size:14px; display:none;">Your watchlist is empty. Click the bookmark icon on any title to add it here.</p>
+      </section>
+    </div>
+
+    <div id="moviesView" style="display:none;">
+      <section class="row">
+        <div class="row-head">
+          <div class="row-icon">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 8h18M3 16h18M8 3v18M16 3v18"/></svg>
+          </div>
+          <h2 class="display">Movies</h2>
+        </div>
+        <div class="grid-wall" id="moviesReel"></div>
+        <p class="catalog-empty" id="moviesEmpty" style="display:none;">No movies found in the catalog yet.</p>
+      </section>
+    </div>
+
+    <div id="seriesView" style="display:none;">
+      <section class="row">
+        <div class="row-head">
+          <div class="row-icon">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 8L4 4v16l16-4"/></svg>
+          </div>
+          <h2 class="display">Series</h2>
+        </div>
+        <div class="grid-wall" id="seriesReel"></div>
+        <p class="catalog-empty" id="seriesEmpty" style="display:none;">No series found in the catalog yet.</p>
+      </section>
+    </div>
+
+    <div id="genresView" style="display:none;">
+      <section class="row">
+        <div class="row-head">
+          <div class="row-icon">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12l9 9 11-11-4-4L7 17z"/></svg>
+          </div>
+          <h2 class="display">Browse by Genre</h2>
+        </div>
+        <div class="genre-grid" id="genrePills"></div>
+      </section>
+      <section class="row">
+        <div class="row-head">
+          <h2 class="display" id="genreResultsTitle">Action</h2>
+        </div>
+        <div class="grid-wall" id="genreResults"></div>
+        <p class="catalog-empty" id="genreResultsEmpty" style="display:none;">Nothing in this genre yet.</p>
+      </section>
+    </div>
 
     <footer>
-      Sleepless Nights - is a personalized website, it is not commercial.
+      Disclaimer - Sleepless Nights is an independent media database created strictly for personal, non-commercial use. This private site does not host, stream, or provide content for the public.
     </footer>
   </div>
 </div>
@@ -734,16 +882,16 @@ const SAMPLE_MOVIES = {
   ],
   drama: [
     { title:"Priscilla", year:"2023", rating:"8.1", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BOWRjYjVhYWUtNjM2OS00OWE1LTk5ZmYtZDM3MjllNzI1ZmQ4XkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/movie?imdb=tt22041854" },
-    { title:"The Quiet Ledger", year:"2023", rating:"7.9", age:"R", poster:"https://picsum.photos/id/1024/400/600", playerUrl:"" },
-    { title:"Second Address", year:"2022", rating:"7.3", age:"PG-13", poster:"https://picsum.photos/id/1025/400/600", playerUrl:"" },
-    { title:"Anniversary", year:"2021", rating:"8.0", age:"PG", poster:"https://picsum.photos/id/1027/400/600", playerUrl:"" },
-    { title:"Field Notes", year:"2024", rating:"7.6", age:"PG-13", poster:"https://picsum.photos/id/1031/400/600", playerUrl:"" },
-    { title:"The Understudy", year:"2020", rating:"7.1", age:"R", poster:"https://picsum.photos/id/1035/400/600", playerUrl:"" }
+    { title:"The Shawshank Redemption", year:"1994", rating:"7.9", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BMDAyY2FhYjctNDc5OS00MDNlLThiMGUtY2UxYWVkNGY2ZjljXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/movie?imdb=tt0111161" },
+    { title:"Fight Club", year:"1999", rating:"8.3", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BOTgyOGQ1NDItNGU3Ny00MjU3LTg2YWEtNmEyYjBiMjI1Y2M5XkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/movie?imdb=tt0137523" },
+    { title:"The Pursuit of Happyness", year:"2006", rating:"8.7", age:"PG", poster:"https://m.media-amazon.com/images/M/MV5BMTQ5NjQ0NDI3NF5BMl5BanBnXkFtZTcwNDI0MjEzMw@@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/movie?imdb=tt0454921" },
+    { title:"The Pianist", year:"2002", rating:"9.0", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BMjEwNmEwYjgtNTk3ZC00NjljLTg5ZDctZTY3ZGQwZjRkZmQxXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/movie?imdb=tt0253474" },
+    { title:"Whiplash", year:"2014", rating:"8.1", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BMDFjOWFkYzktYzhhMC00NmYyLTkwY2EtYjViMDhmNzg0OGFkXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/movie?imdb=tt2582802" }
   ],
   action: [
-    { title:"Action Pick 1", year:"2023", rating:"7.1", age:"PG-13", poster:"https://picsum.photos/id/60/400/600", playerUrl:"" },
-    { title:"Action Pick 2", year:"2023", rating:"7.2", age:"PG-13", poster:"https://picsum.photos/id/61/400/600", playerUrl:"" },
-    { title:"Action Pick 3", year:"2023", rating:"7.3", age:"PG-13", poster:"https://picsum.photos/id/62/400/600", playerUrl:"" }
+    { title:"John Wick", year:"2014", rating:"9.4", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BMTU2NjA1ODgzMF5BMl5BanBnXkFtZTgwMTM2MTI4MjE@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/movie?imdb=tt2911666" },
+    { title:"Gladiator", year:"2000", rating:"8.2", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BYWQ4YmNjYjEtOWE1Zi00Y2U4LWI4NTAtMTU0MjkxNWQ1ZmJiXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/movie?imdb=tt0172495" },
+    { title:"Extraction", year:"2020", rating:"8.3", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BNDBhMmI3OWYtZTA2Ny00Y2RjLTliMWQtYWY5MGIwN2RlZGFjXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/movie?imdb=tt8936646" }
   ],
   adventure: [
     { title:"Adventure Pick 1", year:"2023", rating:"7.1", age:"PG-13", poster:"https://picsum.photos/id/63/400/600", playerUrl:"" },
@@ -751,9 +899,15 @@ const SAMPLE_MOVIES = {
     { title:"Adventure Pick 3", year:"2023", rating:"7.3", age:"PG-13", poster:"https://picsum.photos/id/65/400/600", playerUrl:"" }
   ],
   comedy: [
-    { title:"Comedy Pick 1", year:"2023", rating:"7.1", age:"PG-13", poster:"https://picsum.photos/id/66/400/600", playerUrl:"" },
-    { title:"Comedy Pick 2", year:"2023", rating:"7.2", age:"PG-13", poster:"https://picsum.photos/id/67/400/600", playerUrl:"" },
-    { title:"Comedy Pick 3", year:"2023", rating:"7.3", age:"PG-13", poster:"https://picsum.photos/id/68/400/600", playerUrl:"" }
+    { title:"Superbad", year:"2007", rating:"9.1", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BNjk0MzdlZGEtNTRkOC00ZDRiLWJkYjAtMzUzYTRiNzk1YTViXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/movie?imdb=tt0829482" },
+	{ title:"21 Jump Street", year:"2012", rating:"7.1", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BNzhkMTdmOTUtNWM4NC00MWU2LTk4ZGQtY2ZiZmI0OTEwMmNlXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/movie?imdb=tt1232829" },
+	{ title:"Dumb and Dumber", year:"1994", rating:"9.3", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BNGQxZDA1MmMtYWQ1Ni00NTJmLTljMjgtZWVmODllODVhMzgyXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/movie?imdb=tt0109686" },
+	{ title:"The Nice Guys", year:"2016", rating:"8.2", age:"PG-13", poster:"https://m.media-amazon.com/images/M/MV5BZTc5NzU2MDItNmI4Ny00MWUwLTgxOTMtMjBlYjVlNWYzMzU0XkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/movie?imdb=tt3799694" },
+	{ title:"Ace Ventura: Pet Detective", year:"1994", rating:"8.8", age:"PG-13", poster:"https://m.media-amazon.com/images/M/MV5BOWU1M2Q5MDgtOTkxZS00NjdmLWFlNWEtOGEyOTNlNGYyYTZlXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/movie?imdb=tt0109040" },
+	{ title:"Evan Almighty", year:"2007", rating:"8.5", age:"PG-15", poster:"https://m.media-amazon.com/images/M/MV5BMTUxMTEzODYxMV5BMl5BanBnXkFtZTcwNzQ4ODU0MQ@@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/movie?imdb=tt0413099" },
+    { title:"The Hangover", year:"2009", rating:"7.2", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BNDI2MzBhNzgtOWYyOS00NDM2LWE0OGYtOGQ0M2FjMTI2NTllXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/movie?imdb=tt1119646" },
+    { title:"Little Man", year:"2006", rating:"7.3", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BZTQyNjFlYjYtZWIzNC00MmVmLWEwNDItNDNlMzUyMTNjMTNjXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/movie?imdb=tt0430304" }
+
   ],
   horror: [
     { title:"The Conjuring - Last Rites", year:"2025", rating:"7.1", age:"PG-13", poster:"https://m.media-amazon.com/images/M/MV5BYmU0NzZhYTItOWEyMy00YWE5LTljZjgtOGJhYmIwNDI5NjNiXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/movie?imdb=tt22898462" },
@@ -771,7 +925,7 @@ const SAMPLE_MOVIES = {
     { title:"Mystery Pick 3", year:"2023", rating:"7.3", age:"PG-13", poster:"https://picsum.photos/id/80/400/600", playerUrl:"" }
   ],
   crime: [
-    { title:"Crime Pick 1", year:"2023", rating:"7.1", age:"PG-13", poster:"https://picsum.photos/id/81/400/600", playerUrl:"" },
+    { title:"The Mentalist", year:"2008", rating:"9.7", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BMTQ5OTgzOTczM15BMl5BanBnXkFtZTcwMDM2OTY4MQ@@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/tv?imdb=tt1196946" },
     { title:"Crime Pick 2", year:"2023", rating:"7.2", age:"PG-13", poster:"https://picsum.photos/id/82/400/600", playerUrl:"" },
     { title:"Crime Pick 3", year:"2023", rating:"7.3", age:"PG-13", poster:"https://picsum.photos/id/83/400/600", playerUrl:"" }
   ],
@@ -780,6 +934,11 @@ const SAMPLE_MOVIES = {
     { title:"Science Fiction Pick 2", year:"2023", rating:"7.2", age:"PG-13", poster:"https://picsum.photos/id/85/400/600", playerUrl:"" },
     { title:"Science Fiction Pick 3", year:"2023", rating:"7.3", age:"PG-13", poster:"https://picsum.photos/id/86/400/600", playerUrl:"" }
   ],
+  korean: [
+    { title:"Fantasy Pick 1", year:"2023", rating:"7.1", age:"PG-13", poster:"https://picsum.photos/id/87/400/600", playerUrl:"" },
+    { title:"Fantasy Pick 2", year:"2023", rating:"7.2", age:"PG-13", poster:"https://picsum.photos/id/88/400/600", playerUrl:"" },
+    { title:"Fantasy Pick 3", year:"2023", rating:"7.3", age:"PG-13", poster:"https://picsum.photos/id/89/400/600", playerUrl:"" }
+	],
   fantasy: [
     { title:"Fantasy Pick 1", year:"2023", rating:"7.1", age:"PG-13", poster:"https://picsum.photos/id/87/400/600", playerUrl:"" },
     { title:"Fantasy Pick 2", year:"2023", rating:"7.2", age:"PG-13", poster:"https://picsum.photos/id/88/400/600", playerUrl:"" },
@@ -794,7 +953,7 @@ const SAMPLE_MOVIES = {
     { title:"Bleach", year:"2004", rating:"9.1", age:"PG-15", poster:"https://m.media-amazon.com/images/M/MV5BOWQwOWY5NTUtMjAyZi00YjQzLTkwODgtNmQwZjU1MGIzZDhjXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/tv?imdb=tt0434665" },
     { title:"JoJo's Bizarre Adventure", year:"2012", rating:"9.2", age:"PG-15", poster:"https://m.media-amazon.com/images/M/MV5BMzIyNzY4NTMtNmVhYS00OWFhLTkwMWMtOGFkNTdmNWU2ZDdiXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/tv?imdb=tt2359704" },
     { title:"Solo Leveling", year:"2024", rating:"9.3", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BMjEyMjFlMGEtODkxNy00ZGIwLWIzZGYtNDdiNWQyMGIxNmQwXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/tv?imdb=tt21209876" },
-	{ title:"Berserk", year:"2016", rating:"8.2", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BOTY0ZGMwZmEtNDVmMy00OWJmLWFlNjEtMGZkNTdlN2EzOWVmXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/tv?imdb=tt5847454" },
+	{ title:"Berserk", year:"2016", rating:"8.2", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BOTY0ZGMwZmEtNDVmMy00OWJmLWFlNjEtMGZkNTdlN2EzOWVmXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/tv?imdb=tt0318871" },
 	{ title:"Jujutsu Kaisen", year:"2024", rating:"9.1", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BMjBlNTExMDAtMWZjZi00MDc5LWFkMjgtZDU0ZWQ5ODk3YWY5XkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/tv?imdb=tt12343534" },
 	{ title:"Attack on Titan", year:"2013", rating:"8.9", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BZjliODY5MzQtMmViZC00MTZmLWFhMWMtMjMwM2I3OGY1MTRiXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/tv?imdb=tt2560140" },
 	{ title:"Death Note", year:"2006", rating:"8.3", age:"R", poster:"https://m.media-amazon.com/images/M/MV5BYTgyZDhmMTEtZDFhNi00MTc4LTg3NjUtYWJlNGE5Mzk2NzMxXkEyXkFqcGc@._V1_.jpg", playerUrl:"https://vidsrcme.ru/embed/tv?imdb=tt0877057" },
@@ -882,6 +1041,9 @@ function cardHTML(m){
         <span class="badge age">${m.age}</span>
         <span class="badge hd">HD</span>
         <span class="imdb-pill">IMDb <b>${m.rating}</b></span>
+        <button class="watchlist-toggle" aria-label="Toggle watchlist" type="button">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        </button>
       </div>
       <div class="card-title">${m.title}</div>
       <div class="card-sub">${m.year}</div>
@@ -891,9 +1053,63 @@ function cardHTML(m){
 
 function renderReel(id, items){
   document.getElementById(id).innerHTML = items.map(cardHTML).join("");
-  document.querySelectorAll(`#${id} .card`).forEach((el, i) => {
-    el.addEventListener('click', () => openModal(items[i]));
+  wireCardInteractions(id, items);
+}
+
+/* ============================================================
+   WATCHLIST
+   ============================================================ */
+let watchlist = []; // in-memory list of movie objects the user has bookmarked
+
+function isInWatchlist(title){
+  return watchlist.some(item => item.title === title);
+}
+
+function wireCardInteractions(containerId, items){
+  document.querySelectorAll(`#${containerId} .card`).forEach((el, i) => {
+    const movie = items[i];
+    const toggleBtn = el.querySelector('.watchlist-toggle');
+    if(isInWatchlist(movie.title)) toggleBtn.classList.add('active');
+
+    el.addEventListener('click', (e) => {
+      if(e.target.closest('.watchlist-toggle')) return;
+      openModal(movie);
+    });
+
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleWatchlistItem(movie);
+    });
   });
+}
+
+function toggleWatchlistItem(movie){
+  const idx = watchlist.findIndex(item => item.title === movie.title);
+  if(idx >= 0){
+    watchlist.splice(idx, 1);
+  } else {
+    watchlist.push(movie);
+  }
+  // Sync the star state on every matching card currently on screen (browse rows + watchlist page)
+  document.querySelectorAll('.card').forEach(el => {
+    if(el.dataset.title === movie.title.toLowerCase()){
+      el.querySelector('.watchlist-toggle').classList.toggle('active', isInWatchlist(movie.title));
+    }
+  });
+  renderWatchlist();
+}
+
+function renderWatchlist(){
+  const reel = document.getElementById('watchlistReel');
+  const empty = document.getElementById('watchlistEmpty');
+  if(watchlist.length === 0){
+    reel.innerHTML = "";
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+  reel.innerHTML = watchlist.map(cardHTML).join("");
+  wireCardInteractions('watchlistReel', watchlist);
 }
 
 document.querySelectorAll('.row-nav button').forEach(btn => {
@@ -941,6 +1157,139 @@ document.getElementById('heroPlayBtn').addEventListener('click', () => openModal
 document.getElementById('heroInfoBtn').addEventListener('click', () => openModal(SAMPLE_MOVIES.hero));
 
 /* ============================================================
+   CATALOG (flat, deduplicated list built from every genre row)
+   used to power the Movies / Series pages
+   ============================================================ */
+function inferType(m){
+  if(m.type) return m.type;
+  if(m.playerUrl && m.playerUrl.includes('/embed/tv')) return 'series';
+  return 'movie';
+}
+
+let CATALOG = [];
+function buildCatalog(){
+  const skipKeys = ['hero', 'thumbs'];
+  const seen = new Set();
+  CATALOG = [];
+  Object.keys(SAMPLE_MOVIES).forEach(cat => {
+    if(skipKeys.includes(cat)) return;
+    SAMPLE_MOVIES[cat].forEach(m => {
+      m.type = inferType(m);
+      if(!seen.has(m.title)){
+        seen.add(m.title);
+        CATALOG.push(m);
+      }
+    });
+  });
+}
+
+function renderCatalogView(reelId, emptyId, type){
+  const items = CATALOG.filter(m => m.type === type);
+  const reel = document.getElementById(reelId);
+  const empty = document.getElementById(emptyId);
+  if(items.length === 0){
+    reel.innerHTML = "";
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+  reel.innerHTML = items.map(cardHTML).join("");
+  wireCardInteractions(reelId, items);
+}
+
+/* ============================================================
+   GENRES picker — clicking a pill filters and shows that
+   genre's titles right here, instead of just scrolling away
+   ============================================================ */
+const GENRE_META = {
+  action: { label:"Action" },
+  adventure: { label:"Adventure" },
+  comedy: { label:"Comedy" },
+  drama: { label:"Drama" },
+  horror: { label:"Horror" },
+  thriller: { label:"Thriller" },
+  mystery: { label:"Mystery" },
+  crime: { label:"Crime" },
+  scienceFiction: { label:"Science Fiction" },
+  fantasy: { label:"Fantasy" },
+  korean: {label:"Korean"},
+  romance: { label:"Romance" },
+  anime: { label:"Anime" },
+  cartoon: { label:"Cartoon" },
+  documentary: { label:"Documentary" },
+  biography: { label:"Biography" },
+  historical: { label:"Historical" },
+  war: { label:"War" },
+  western: { label:"Western" },
+  musical: { label:"Musical" },
+  sports: { label:"Sports" }
+};
+
+let activeGenre = null;
+
+function renderGenrePills(){
+  const container = document.getElementById('genrePills');
+  container.innerHTML = Object.entries(GENRE_META).map(([key, meta]) =>
+    `<button type="button" class="genre-pill" data-key="${key}">${meta.label}</button>`
+  ).join("");
+  container.querySelectorAll('.genre-pill').forEach(btn => {
+    btn.addEventListener('click', () => selectGenre(btn.dataset.key));
+  });
+}
+
+function selectGenre(key){
+  activeGenre = key;
+  document.querySelectorAll('#genrePills .genre-pill').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.key === key);
+  });
+  const meta = GENRE_META[key];
+  const items = SAMPLE_MOVIES[key] || [];
+  const grid = document.getElementById('genreResults');
+  const empty = document.getElementById('genreResultsEmpty');
+  document.getElementById('genreResultsTitle').textContent = meta.label;
+  if(items.length === 0){
+    grid.innerHTML = "";
+    empty.style.display = "block";
+  } else {
+    empty.style.display = "none";
+    grid.innerHTML = items.map(cardHTML).join("");
+    wireCardInteractions('genreResults', items);
+  }
+}
+
+/* ============================================================
+   NAVIGATION — one function drives Home / Movies / Series /
+   Genres / Watchlist
+   ============================================================ */
+const VIEW_IDS = {
+  browse: 'browseView',
+  movies: 'moviesView',
+  series: 'seriesView',
+  genres: 'genresView',
+  watchlist: 'watchlistView'
+};
+
+function showView(view){
+  Object.entries(VIEW_IDS).forEach(([key, id]) => {
+    document.getElementById(id).style.display = (key === view) ? '' : 'none';
+  });
+  document.querySelectorAll('.side-link[data-view]').forEach(link => {
+    link.classList.toggle('active', link.dataset.view === view);
+  });
+  if(view === 'watchlist') renderWatchlist();
+  if(view === 'movies') renderCatalogView('moviesReel', 'moviesEmpty', 'movie');
+  if(view === 'series') renderCatalogView('seriesReel', 'seriesEmpty', 'series');
+  if(view === 'genres' && !activeGenre) selectGenre(Object.keys(GENRE_META)[0]);
+}
+
+document.querySelectorAll('.side-link[data-view]').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    showView(link.dataset.view);
+  });
+});
+
+/* ============================================================
    INIT
    ============================================================ */
 (function init(){
@@ -956,6 +1305,7 @@ document.getElementById('heroInfoBtn').addEventListener('click', () => openModal
   renderReel('crimeReel', SAMPLE_MOVIES.crime);
   renderReel('scienceFictionReel', SAMPLE_MOVIES.scienceFiction);
   renderReel('fantasyReel', SAMPLE_MOVIES.fantasy);
+  renderReel('koreanReel', SAMPLE_MOVIES.korean);
   renderReel('romanceReel', SAMPLE_MOVIES.romance);
   renderReel('animeReel', SAMPLE_MOVIES.anime);
   renderReel('cartoonReel', SAMPLE_MOVIES.cartoon);
@@ -966,6 +1316,10 @@ document.getElementById('heroInfoBtn').addEventListener('click', () => openModal
   renderReel('westernReel', SAMPLE_MOVIES.western);
   renderReel('musicalReel', SAMPLE_MOVIES.musical);
   renderReel('sportsReel', SAMPLE_MOVIES.sports);
+  buildCatalog();
+  renderGenrePills();
+  renderWatchlist();
+  showView('browse');
 })();
 </script>
 
